@@ -1,0 +1,20 @@
+plugins {
+    id 'application'
+	id 'com.diffplug.spotless'
+}
+
+spotless {
+    java {
+        target "**/*.java"		  
+        googleJavaFormat()
+	}
+}		
+	
+dependencies {
+     implementation files('libs/groovy-3.0.7.jar')
+    //implementation 'org.codehaus.groovy:groovy:3.0.7'
+}
+
+application {    
+    mainClass = 'org.deenu.gradle.parser.Main'
+}
