@@ -35,7 +35,6 @@ public class GradleBuildScript {
     }
     this.astBuilder = new AstBuilder();
     this.aSTNodes = getASTNodes();
-    this.gradleBuildScriptVisitor = new GradleBuildScriptVisitor();
   }
 
   public File getGradleBuildFile() {
@@ -47,16 +46,19 @@ public class GradleBuildScript {
   }
 
   public List<Plugin> getPlugins() {
+    this.gradleBuildScriptVisitor = new GradleBuildScriptVisitor();
     walkScript(gradleBuildScriptVisitor);
     return this.gradleBuildScriptVisitor.getPlugins();
   }
 
   public List<Repository> getRepositories() {
+    this.gradleBuildScriptVisitor = new GradleBuildScriptVisitor();
     walkScript(gradleBuildScriptVisitor);
     return this.gradleBuildScriptVisitor.getRepositories();
   }
 
   public List<Repository> getBuildScriptRepositories() {
+    this.gradleBuildScriptVisitor = new GradleBuildScriptVisitor();
     walkScript(gradleBuildScriptVisitor);
     return this.gradleBuildScriptVisitor.getBuildScriptRepositories();
   }

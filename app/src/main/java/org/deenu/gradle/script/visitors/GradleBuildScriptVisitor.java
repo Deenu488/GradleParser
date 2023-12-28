@@ -51,6 +51,10 @@ public class GradleBuildScriptVisitor extends CodeVisitorSupport {
     return repositories;
   }
 
+  public int getBuildScriptLastLineNumber() {
+    return buildscriptLastLineNumber;
+  }
+
   public int getBuildScriptRepositoriesLastLineNumber() {
     return buildscriptRepositoriesLastLineNumber;
   }

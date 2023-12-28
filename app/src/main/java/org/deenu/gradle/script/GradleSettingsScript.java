@@ -16,7 +16,6 @@ public class GradleSettingsScript {
   private AstBuilder astBuilder;
   private List<ASTNode> aSTNodes;
   private String scriptContents;
-
   private GradleSettingsScriptVisitor gradleSettingsScriptVisitor;
 
   public GradleSettingsScript(File settingsGradle) throws Exception, FileNotFoundException {
@@ -36,7 +35,6 @@ public class GradleSettingsScript {
     }
     this.astBuilder = new AstBuilder();
     this.aSTNodes = getASTNodes();
-    this.gradleSettingsScriptVisitor = new GradleSettingsScriptVisitor();
   }
 
   public File getGradleSettingsFile() {
@@ -48,6 +46,7 @@ public class GradleSettingsScript {
   }
 
   public List<Include> getIncludes() {
+    this.gradleSettingsScriptVisitor = new GradleSettingsScriptVisitor();
     walkScript(gradleSettingsScriptVisitor);
     return this.gradleSettingsScriptVisitor.getIncludes();
   }
