@@ -9,6 +9,7 @@ import org.codehaus.groovy.ast.expr.BinaryExpression;
 import org.codehaus.groovy.ast.expr.ConstantExpression;
 import org.codehaus.groovy.ast.expr.Expression;
 import org.codehaus.groovy.ast.expr.MethodCallExpression;
+import org.codehaus.groovy.ast.expr.TupleExpression;
 import org.codehaus.groovy.ast.stmt.BlockStatement;
 import org.deenu.gradle.models.FlatDir;
 import org.deenu.gradle.models.Include;
@@ -60,7 +61,15 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
   private int allprojectsrepositoriesflatDirLastLineNumber = -1;
   private String allprojectsrepositoriesflatDirConfigurationName;
   private boolean inAllProjectsRepositoriesFlatDir = false;
-  private List<FlatDir> allprojectsrepositoriesflatDirs = new ArrayList<>();
+
+  private int flatDirdirsLastLineNumber = -1;
+  private String flatDirdirsConfigurationName;
+  private boolean inFlatDirDirs = false;
+
+  private int allprojectsrepositoriesflatDirdirsLastLineNumber = -1;
+  private String allprojectsrepositoriesflatDirdirsConfigurationName;
+  private boolean inAllProjectsRepositoriesFlatDirDirs = false;
+  private List<FlatDir> allprojectsrepositoriesflatDirDirs = new ArrayList<>();
 
   public int getPluginsLastLineNumber() {
     return pluginsLastLineNumber;
@@ -106,12 +115,20 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
     return flatDirLastLineNumber;
   }
 
+  public int getFlatDirDirsLastLineNumber() {
+    return flatDirdirsLastLineNumber;
+  }
+
   public int getAllProjectsRepositoriesFlatDirLastLineNumber() {
     return allprojectsrepositoriesflatDirLastLineNumber;
   }
 
-  public List<FlatDir> getAllProjectsRepositoriesFlatDirs() {
-    return allprojectsrepositoriesflatDirs;
+  public int getAllProjectsRepositoriesFlatDirDirsLastLineNumber() {
+    return allprojectsrepositoriesflatDirdirsLastLineNumber;
+  }
+
+  public List<FlatDir> getAllProjectsRepositoriesFlatDirDirs() {
+    return allprojectsrepositoriesflatDirDirs;
   }
 
   public String getRootProjectName() {
@@ -131,13 +148,13 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
 
     List<Expression> expressions = argumentListExpression.getExpressions();
     if (expressions != null) {
+
       if ((expressions.size() == 1) && (expressions.get(0) instanceof ConstantExpression)) {
         ConstantExpression constantExpression = (ConstantExpression) expressions.get(0);
 
         if (constantExpression != null) {
           int lineNumber = constantExpression.getLineNumber();
           String expressionText = constantExpression.getText();
-
           if (expressionText != null
               && inPlugins
               && !inBuildScript
@@ -174,14 +191,6 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
               && !inFlatDir) {
             allprojectsRepositories.add(
                 new Repository(allprojectsRepositoriesConfigurationName, expressionText));
-          }
-
-          if (expressionText != null
-              && inAllProjectsRepositories
-              && inAllProjectsRepositoriesFlatDir
-              && !inBuildScriptRepositories
-              && !inPlugins) {
-            allprojectsrepositoriesflatDirs.add(new FlatDir(expressionText));
           }
 
           if (expressionText != null && inInclude) {
@@ -241,7 +250,7 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
       blockStatementStack.pop();
 
     } else if (inAllProjectsRepositories
-        && inAllProjectsRepositoriesFlatDir
+        && inAllProjectsRepositoriesFlatDirDirs
         && !inBuildScriptRepositories
         && !inPlugins) {
       blockStatementStack.push(true);
@@ -294,6 +303,14 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
       inAllProjectsRepositoriesFlatDir = false;
     }
 
+    if (lineNumber > flatDirdirsLastLineNumber) {
+      inFlatDirDirs = false;
+    }
+
+    if (lineNumber > allprojectsrepositoriesflatDirdirsLastLineNumber) {
+      inAllProjectsRepositoriesFlatDirDirs = false;
+    }
+
     if (methodName.equals("plugins")) {
       pluginsLastLineNumber = methodCallExpression.getLastLineNumber();
       inPlugins = true;
@@ -324,6 +341,11 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
       inFlatDir = true;
     }
 
+    if (methodName.equals("dirs")) {
+      flatDirdirsLastLineNumber = methodCallExpression.getLastLineNumber();
+      inFlatDirDirs = true;
+    }
+
     if (inBuildScript && inRepositories) {
       buildscriptRepositoriesLastLineNumber = methodCallExpression.getLastLineNumber();
       inBuildScriptRepositories = true;
@@ -337,6 +359,11 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
     if (inAllProjects && inRepositories && inFlatDir) {
       allprojectsrepositoriesflatDirLastLineNumber = methodCallExpression.getLastLineNumber();
       inAllProjectsRepositoriesFlatDir = true;
+    }
+
+    if (inAllProjects && inRepositories && inFlatDir && inFlatDirDirs) {
+      allprojectsrepositoriesflatDirdirsLastLineNumber = methodCallExpression.getLastLineNumber();
+      inAllProjectsRepositoriesFlatDirDirs = true;
     }
 
     if (inRepositories && !inPlugins && !inBuildScript && !inAllProjects && !inFlatDir) {
@@ -386,6 +413,33 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
       }
     }
 
+    if ((inAllProjectsRepositories
+            && inAllProjectsRepositoriesFlatDirDirs
+            && !inBuildScriptRepositories
+            && !inPlugins)
+        && (blockStatementStack.isEmpty() ? false : blockStatementStack.peek())) {
+      allprojectsrepositoriesflatDirdirsConfigurationName = methodName;
+
+      Expression expression = methodCallExpression.getArguments();
+
+      if (expression != null && expression instanceof TupleExpression) {
+        TupleExpression tupleExpression = (TupleExpression) expression;
+        if (tupleExpression != null) {
+          for (Expression expr : tupleExpression.getExpressions()) {
+            if (expr != null && expr instanceof ConstantExpression) {
+              ConstantExpression constantExpression = (ConstantExpression) expr;
+              if (constantExpression != null) {
+                String constantExpressionText = constantExpression.getText();
+                if (constantExpressionText != null) {
+                  allprojectsrepositoriesflatDirDirs.add(new FlatDir(constantExpressionText));
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
     if ((inPlugins && !inBuildScript && !inAllProjects && !inFlatDir)
         && (blockStatementStack.isEmpty() ? false : blockStatementStack.peek())) {
       pluginsConfigurationName = methodName;
@@ -409,15 +463,6 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
       allprojectsRepositoriesConfigurationName = methodName;
       super.visitMethodCallExpression(methodCallExpression);
       allprojectsRepositoriesConfigurationName = null;
-
-    } else if ((inAllProjectsRepositories
-            && inAllProjectsRepositoriesFlatDir
-            && !inBuildScriptRepositories
-            && !inPlugins)
-        && (blockStatementStack.isEmpty() ? false : blockStatementStack.peek())) {
-      allprojectsrepositoriesflatDirConfigurationName = methodName;
-      super.visitMethodCallExpression(methodCallExpression);
-      allprojectsrepositoriesflatDirConfigurationName = null;
 
     } else if (inInclude) {
       includeConfigurationName = methodName;

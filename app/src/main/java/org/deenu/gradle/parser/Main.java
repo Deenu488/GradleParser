@@ -21,7 +21,8 @@ public class Main {
       System.out.println("BuildScriptRepositories: " + gradleScript.getBuildScriptRepositories());
       System.out.println("AllProjectsRepositories: " + gradleScript.getAllProjectsRepositories());
       System.out.println(
-          "AllProjectsRepositoriesFlatDirs: " + gradleScript.getAllProjectsRepositoriesFlatDirs());
+          "AllProjectsRepositoriesFlatDirDirs: "
+              + gradleScript.getAllProjectsRepositoriesFlatDirDirs());
       System.out.println("rootProjectName: " + gradleScript.getRootProjectName());
       System.out.println("Include: " + gradleScript.getIncludes());
 

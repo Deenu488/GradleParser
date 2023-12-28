@@ -25,7 +25,11 @@ allprojects {
         
         flatDir {
             dirs 'lib'           
-        }   
+        } 
+        
+        flatDir {
+            dirs 'lib2','lib3'          
+        }    
     }   
 }
 

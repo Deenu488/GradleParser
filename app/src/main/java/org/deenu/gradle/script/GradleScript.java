@@ -93,10 +93,10 @@ public class GradleScript {
     return this.gradleScriptVisitor.getAllProjectsRepositories();
   }
 
-  public List<FlatDir> getAllProjectsRepositoriesFlatDirs() {
+  public List<FlatDir> getAllProjectsRepositoriesFlatDirDirs() {
     this.gradleScriptVisitor = new GradleScriptVisitor();
     walkScript(gradleScriptVisitor);
-    return this.gradleScriptVisitor.getAllProjectsRepositoriesFlatDirs();
+    return this.gradleScriptVisitor.getAllProjectsRepositoriesFlatDirDirs();
   }
 
   public String getRootProjectName() {
