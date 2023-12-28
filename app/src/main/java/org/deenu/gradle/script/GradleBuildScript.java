@@ -63,6 +63,12 @@ public class GradleBuildScript {
     return this.gradleBuildScriptVisitor.getBuildScriptRepositories();
   }
 
+  public List<Repository> getAllProjectsRepositories() {
+    this.gradleBuildScriptVisitor = new GradleBuildScriptVisitor();
+    walkScript(gradleBuildScriptVisitor);
+    return this.gradleBuildScriptVisitor.getAllProjectsRepositories();
+  }
+
   private void walkScript(GroovyCodeVisitor visitor) {
     for (ASTNode astNode : aSTNodes) {
       astNode.visit(visitor);

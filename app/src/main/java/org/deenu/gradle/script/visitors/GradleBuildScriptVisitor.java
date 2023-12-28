@@ -28,12 +28,21 @@ public class GradleBuildScriptVisitor extends CodeVisitorSupport {
 
   private int buildscriptRepositoriesLastLineNumber = -1;
   private String buildscriptRepositoriesConfigurationName;
-  private boolean inBuildscriptRepositories = false;
+  private boolean inBuildScriptRepositories = false;
   private List<Repository> buildscriptRepositories = new ArrayList<>();
 
   private int buildscriptLastLineNumber = -1;
   private String buildscriptConfigurationName;
-  private boolean inBuildscript = false;
+  private boolean inBuildScript = false;
+
+  private int allprojectsLastLineNumber = -1;
+  private String allprojectsConfigurationName;
+  private boolean inAllProjects = false;
+
+  private int allprojectsRepositoriesLastLineNumber = -1;
+  private String allprojectsRepositoriesConfigurationName;
+  private boolean inAllProjectsRepositories = false;
+  private List<Repository> allprojectsRepositories = new ArrayList<>();
 
   public int getPluginsLastLineNumber() {
     return pluginsLastLineNumber;
@@ -63,32 +72,59 @@ public class GradleBuildScriptVisitor extends CodeVisitorSupport {
     return buildscriptRepositories;
   }
 
+  public int getAllProjectsLastLineNumber() {
+    return allprojectsLastLineNumber;
+  }
+
+  public int getAllProjectsRepositoriesLastLineNumber() {
+    return allprojectsRepositoriesLastLineNumber;
+  }
+
+  public List<Repository> getAllProjectsRepositories() {
+    return allprojectsRepositories;
+  }
+
   @Override
   public void visitArgumentlistExpression(ArgumentListExpression argumentListExpression) {
+
     List<Expression> expressions = argumentListExpression.getExpressions();
     if (expressions != null) {
       if ((expressions.size() == 1) && (expressions.get(0) instanceof ConstantExpression)) {
         ConstantExpression constantExpression = (ConstantExpression) expressions.get(0);
+
         if (constantExpression != null) {
           int lineNumber = constantExpression.getLineNumber();
           String expressionText = constantExpression.getText();
-          if (expressionText != null && inPlugins) {
+
+          if (expressionText != null && inPlugins && !inBuildScript && !inAllProjects) {
             plugins.add(new Plugin(expressionText));
           }
+
           if (expressionText != null
               && repositoriesConfigurationName != null
               && inRepositories
               && !inPlugins
-              && !inBuildscript) {
+              && !inBuildScript
+              && !inAllProjects) {
             repositories.add(new Repository(repositoriesConfigurationName, expressionText));
           }
 
           if (expressionText != null
               && buildscriptRepositoriesConfigurationName != null
-              && inBuildscriptRepositories
+              && inBuildScriptRepositories
+              && !inAllProjectsRepositories
               && !inPlugins) {
             buildscriptRepositories.add(
                 new Repository(buildscriptRepositoriesConfigurationName, expressionText));
+          }
+
+          if (expressionText != null
+              && allprojectsRepositoriesConfigurationName != null
+              && inAllProjectsRepositories
+              && !inBuildScriptRepositories
+              && !inPlugins) {
+            allprojectsRepositories.add(
+                new Repository(allprojectsRepositoriesConfigurationName, expressionText));
           }
         }
       }
@@ -98,18 +134,27 @@ public class GradleBuildScriptVisitor extends CodeVisitorSupport {
 
   @Override
   public void visitBlockStatement(BlockStatement blockStatement) {
-    if (inPlugins) {
+
+    if (inPlugins && !inBuildScript && !inAllProjects) {
       blockStatementStack.push(true);
       super.visitBlockStatement(blockStatement);
       blockStatementStack.pop();
-    } else if (inRepositories && !inPlugins && !inBuildscript) {
+
+    } else if (inRepositories && !inPlugins && !inBuildScript && !inAllProjects) {
       blockStatementStack.push(true);
       super.visitBlockStatement(blockStatement);
       blockStatementStack.pop();
-    } else if (inBuildscriptRepositories && !inPlugins) {
+
+    } else if (inBuildScriptRepositories && !inAllProjectsRepositories && !inPlugins) {
       blockStatementStack.push(true);
       super.visitBlockStatement(blockStatement);
       blockStatementStack.pop();
+
+    } else if (inAllProjectsRepositories && !inBuildScriptRepositories && !inPlugins) {
+      blockStatementStack.push(true);
+      super.visitBlockStatement(blockStatement);
+      blockStatementStack.pop();
+
     } else {
       super.visitBlockStatement(blockStatement);
     }
@@ -123,16 +168,25 @@ public class GradleBuildScriptVisitor extends CodeVisitorSupport {
     if (lineNumber > pluginsLastLineNumber) {
       inPlugins = false;
     }
+
     if (lineNumber > repositoriesLastLineNumber) {
       inRepositories = false;
     }
 
     if (lineNumber > buildscriptLastLineNumber) {
-      inBuildscript = false;
+      inBuildScript = false;
     }
 
     if (lineNumber > buildscriptRepositoriesLastLineNumber) {
-      inBuildscriptRepositories = false;
+      inBuildScriptRepositories = false;
+    }
+
+    if (lineNumber > allprojectsLastLineNumber) {
+      inAllProjects = false;
+    }
+
+    if (lineNumber > allprojectsRepositoriesLastLineNumber) {
+      inAllProjectsRepositories = false;
     }
 
     if (methodName.equals("plugins")) {
@@ -147,15 +201,25 @@ public class GradleBuildScriptVisitor extends CodeVisitorSupport {
 
     if (methodName.equals("buildscript")) {
       buildscriptLastLineNumber = methodCallExpression.getLastLineNumber();
-      inBuildscript = true;
+      inBuildScript = true;
     }
 
-    if (inBuildscript && inRepositories) {
+    if (inBuildScript && inRepositories) {
       buildscriptRepositoriesLastLineNumber = methodCallExpression.getLastLineNumber();
-      inBuildscriptRepositories = true;
+      inBuildScriptRepositories = true;
     }
 
-    if (inRepositories && !inPlugins && !inBuildscript) {
+    if (methodName.equals("allprojects")) {
+      allprojectsLastLineNumber = methodCallExpression.getLastLineNumber();
+      inAllProjects = true;
+    }
+
+    if (inAllProjects && inRepositories) {
+      allprojectsRepositoriesLastLineNumber = methodCallExpression.getLastLineNumber();
+      inAllProjectsRepositories = true;
+    }
+
+    if (inRepositories && !inPlugins && !inBuildScript && !inAllProjects) {
       if (methodName.equals("google")) {
         repositories.add(new Repository(methodName, "https://maven.google.com/"));
       }
@@ -170,7 +234,7 @@ public class GradleBuildScriptVisitor extends CodeVisitorSupport {
       }
     }
 
-    if (inBuildscriptRepositories && !inPlugins) {
+    if (inBuildScriptRepositories && !inAllProjectsRepositories && !inPlugins) {
       if (methodName.equals("google")) {
         buildscriptRepositories.add(new Repository(methodName, "https://maven.google.com/"));
       }
@@ -186,20 +250,46 @@ public class GradleBuildScriptVisitor extends CodeVisitorSupport {
       }
     }
 
-    if ((inPlugins) && (blockStatementStack.isEmpty() ? false : blockStatementStack.peek())) {
+    if (inAllProjectsRepositories && !inBuildScriptRepositories && !inPlugins) {
+      if (methodName.equals("google")) {
+        allprojectsRepositories.add(new Repository(methodName, "https://maven.google.com/"));
+      }
+      if (methodName.equals("mavenLocal")) {
+        allprojectsRepositories.add(new Repository(methodName, ".m2/repository"));
+      }
+      if (methodName.equals("mavenCentral")) {
+        allprojectsRepositories.add(
+            new Repository(methodName, "https://repo.maven.apache.org/maven2/"));
+      }
+      if (methodName.equals("gradlePluginPortal")) {
+        allprojectsRepositories.add(new Repository(methodName, "https://plugins.gradle.org/m2/"));
+      }
+    }
+
+    if ((inPlugins && !inBuildScript && !inAllProjects)
+        && (blockStatementStack.isEmpty() ? false : blockStatementStack.peek())) {
       pluginsConfigurationName = methodName;
       super.visitMethodCallExpression(methodCallExpression);
       pluginsConfigurationName = null;
-    } else if ((inRepositories && !inPlugins && !inBuildscript)
+
+    } else if ((inRepositories && !inPlugins && !inBuildScript && !inAllProjects)
         && (blockStatementStack.isEmpty() ? false : blockStatementStack.peek())) {
       repositoriesConfigurationName = methodName;
       super.visitMethodCallExpression(methodCallExpression);
       repositoriesConfigurationName = null;
-    } else if ((inBuildscriptRepositories && !inPlugins)
+
+    } else if ((inBuildScriptRepositories && !inAllProjectsRepositories && !inPlugins)
         && (blockStatementStack.isEmpty() ? false : blockStatementStack.peek())) {
       buildscriptRepositoriesConfigurationName = methodName;
       super.visitMethodCallExpression(methodCallExpression);
       buildscriptRepositoriesConfigurationName = null;
+
+    } else if ((inAllProjectsRepositories && !inBuildScriptRepositories && !inPlugins)
+        && (blockStatementStack.isEmpty() ? false : blockStatementStack.peek())) {
+      allprojectsRepositoriesConfigurationName = methodName;
+      super.visitMethodCallExpression(methodCallExpression);
+      allprojectsRepositoriesConfigurationName = null;
+
     } else {
       super.visitMethodCallExpression(methodCallExpression);
     }

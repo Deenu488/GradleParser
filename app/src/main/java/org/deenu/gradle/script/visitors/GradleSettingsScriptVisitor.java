@@ -30,12 +30,15 @@ public class GradleSettingsScriptVisitor extends CodeVisitorSupport {
   @Override
   public void visitArgumentlistExpression(ArgumentListExpression argumentListExpression) {
     List<Expression> expressions = argumentListExpression.getExpressions();
+
     if (expressions != null) {
       if ((expressions.size() == 1) && (expressions.get(0) instanceof ConstantExpression)) {
         ConstantExpression constantExpression = (ConstantExpression) expressions.get(0);
+
         if (constantExpression != null) {
           int lineNumber = constantExpression.getLineNumber();
           String expressionText = constantExpression.getText();
+
           if (expressionText != null && inInclude) {
             includes.add(new Include(expressionText));
           }
@@ -48,19 +51,22 @@ public class GradleSettingsScriptVisitor extends CodeVisitorSupport {
   @Override
   public void visitMethodCallExpression(MethodCallExpression methodCallExpression) {
     int lineNumber = methodCallExpression.getLineNumber();
+    String methodName = methodCallExpression.getMethodAsString();
+
     if (lineNumber > includeLastLineNumber) {
       inInclude = false;
     }
 
-    String methodName = methodCallExpression.getMethodAsString();
     if (methodName.equals("include")) {
       includeLastLineNumber = methodCallExpression.getLastLineNumber();
       inInclude = true;
     }
+
     if (inInclude) {
       includeConfigurationName = methodName;
       super.visitMethodCallExpression(methodCallExpression);
       includeConfigurationName = null;
+
     } else {
       super.visitMethodCallExpression(methodCallExpression);
     }

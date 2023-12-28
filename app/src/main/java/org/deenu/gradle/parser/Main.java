@@ -12,9 +12,12 @@ public class Main {
 
       File buildGradle = new File("/storage/emulated/0/test/build.gradle");
       GradleBuildScript gradleBuildScript = new GradleBuildScript(buildGradle);
-      System.out.println(gradleBuildScript.getPlugins());
-      System.out.println(gradleBuildScript.getRepositories());
-      System.out.println(gradleBuildScript.getBuildScriptRepositories());
+      System.out.println("Plguins: " + gradleBuildScript.getPlugins());
+      System.out.println("Repositories: " + gradleBuildScript.getRepositories());
+      System.out.println(
+          "BuildScriptRepositories" + gradleBuildScript.getBuildScriptRepositories());
+      System.out.println(
+          "AllProjectsRepositories" + gradleBuildScript.getAllProjectsRepositories());
 
       buildGradle = new File("/storage/emulated/0/test/settings.gradle");
       GradleSettingsScript gradleSettingsScript = new GradleSettingsScript(buildGradle);
