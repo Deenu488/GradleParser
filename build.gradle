@@ -6,11 +6,12 @@ buildscript {
         mavenLocal()
         mavenCentral()
     }
+	
     dependencies {
         classpath "com.diffplug.spotless:spotless-plugin-gradle:6.20.0"		
-    }
-    
+    }    
 }
+
 allprojects {
     repositories {
         maven { url "https://jitpack.io" }	

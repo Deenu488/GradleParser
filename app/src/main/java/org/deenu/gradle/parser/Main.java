@@ -2,8 +2,7 @@ package org.deenu.gradle.parser;
 
 import java.io.File;
 import org.deenu.gradle.parser.exception.ParserFailedException;
-import org.deenu.gradle.script.GradleBuildScript;
-import org.deenu.gradle.script.GradleSettingsScript;
+import org.deenu.gradle.script.GradleScript;
 
 public class Main {
 
@@ -11,19 +10,20 @@ public class Main {
     try {
 
       File buildGradle = new File("/storage/emulated/0/test/build.gradle");
-      GradleBuildScript gradleBuildScript = new GradleBuildScript(buildGradle);
-      System.out.println("Plugins: " + gradleBuildScript.getPlugins());
-      System.out.println("Repositories: " + gradleBuildScript.getRepositories());
-      System.out.println(
-          "BuildScriptRepositories: " + gradleBuildScript.getBuildScriptRepositories());
-      System.out.println(
-          "AllProjectsRepositories: " + gradleBuildScript.getAllProjectsRepositories());
+      GradleScript gradleScript = new GradleScript(buildGradle);
 
-      buildGradle = new File("/storage/emulated/0/test/settings.gradle");
-
-      GradleSettingsScript gradleSettingsScript = new GradleSettingsScript(buildGradle);
-      System.out.println("rootProjectName: " + gradleSettingsScript.getRootProjectName());
-      System.out.println("Includes: " + gradleSettingsScript.getIncludes());
+      System.out.println("GradleFile: " + gradleScript.getGradleFile());
+      System.out.println("GradleFileName: " + gradleScript.getGradleFileName());
+      System.out.println("IsGradleBuildFile: " + gradleScript.isGradleBuildFile());
+      System.out.println("IsGradleSettingsFile: " + gradleScript.isGradleSettingsFile());
+      System.out.println("Plugins: " + gradleScript.getPlugins());
+      System.out.println("Repositories: " + gradleScript.getRepositories());
+      System.out.println("BuildScriptRepositories: " + gradleScript.getBuildScriptRepositories());
+      System.out.println("AllProjectsRepositories: " + gradleScript.getAllProjectsRepositories());
+      System.out.println(
+          "AllProjectsRepositoriesFlatDirs: " + gradleScript.getAllProjectsRepositoriesFlatDirs());
+      System.out.println("rootProjectName: " + gradleScript.getRootProjectName());
+      System.out.println("Include: " + gradleScript.getIncludes());
 
     } catch (Exception e) {
       System.out.println(new ParserFailedException(e.getMessage()));
