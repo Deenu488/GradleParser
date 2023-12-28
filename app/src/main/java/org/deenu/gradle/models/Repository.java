@@ -33,6 +33,6 @@ public class Repository {
 
   @Override
   public String toString() {
-    return repositories.toString();
+    return repositoryName + ":" + repositoryUrl;
   }
 }

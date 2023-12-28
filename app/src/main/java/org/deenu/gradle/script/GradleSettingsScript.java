@@ -45,6 +45,12 @@ public class GradleSettingsScript {
     return this.astBuilder.buildFromString(scriptContents);
   }
 
+  public String getRootProjectName() {
+    this.gradleSettingsScriptVisitor = new GradleSettingsScriptVisitor();
+    walkScript(gradleSettingsScriptVisitor);
+    return this.gradleSettingsScriptVisitor.getRootProjectName();
+  }
+
   public List<Include> getIncludes() {
     this.gradleSettingsScriptVisitor = new GradleSettingsScriptVisitor();
     walkScript(gradleSettingsScriptVisitor);

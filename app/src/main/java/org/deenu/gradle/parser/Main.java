@@ -12,16 +12,18 @@ public class Main {
 
       File buildGradle = new File("/storage/emulated/0/test/build.gradle");
       GradleBuildScript gradleBuildScript = new GradleBuildScript(buildGradle);
-      System.out.println("Plguins: " + gradleBuildScript.getPlugins());
+      System.out.println("Plugins: " + gradleBuildScript.getPlugins());
       System.out.println("Repositories: " + gradleBuildScript.getRepositories());
       System.out.println(
-          "BuildScriptRepositories" + gradleBuildScript.getBuildScriptRepositories());
+          "BuildScriptRepositories: " + gradleBuildScript.getBuildScriptRepositories());
       System.out.println(
-          "AllProjectsRepositories" + gradleBuildScript.getAllProjectsRepositories());
+          "AllProjectsRepositories: " + gradleBuildScript.getAllProjectsRepositories());
 
       buildGradle = new File("/storage/emulated/0/test/settings.gradle");
+
       GradleSettingsScript gradleSettingsScript = new GradleSettingsScript(buildGradle);
-      System.out.println(gradleSettingsScript.getIncludes());
+      System.out.println("rootProjectName: " + gradleSettingsScript.getRootProjectName());
+      System.out.println("Includes: " + gradleSettingsScript.getIncludes());
 
     } catch (Exception e) {
       System.out.println(new ParserFailedException(e.getMessage()));
