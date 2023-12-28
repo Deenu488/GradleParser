@@ -14,7 +14,8 @@ public class Main {
       GradleBuildScript gradleBuildScript = new GradleBuildScript(buildGradle);
       System.out.println(gradleBuildScript.getPlugins());
       System.out.println(gradleBuildScript.getRepositories());
-   
+      System.out.println(gradleBuildScript.getBuildScriptRepositories());
+
       buildGradle = new File("/storage/emulated/0/test/settings.gradle");
       GradleSettingsScript gradleSettingsScript = new GradleSettingsScript(buildGradle);
       System.out.println(gradleSettingsScript.getIncludes());
