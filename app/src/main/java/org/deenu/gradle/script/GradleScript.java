@@ -110,6 +110,12 @@ public class GradleScript {
     walkScript(gradleScriptVisitor);
     return this.gradleScriptVisitor.getDependencyResolutionManagementRepositories();
   }
+  
+  public List<FlatDir> getDependencyResolutionManagementRepositoriesFlatDirDirs() {
+    this.gradleScriptVisitor = new GradleScriptVisitor();
+    walkScript(gradleScriptVisitor);
+    return this.gradleScriptVisitor .getDependencyResolutionManagementRepositoriesFlatDirDirs();
+  }
 
   public String getRootProjectName() {
     this.gradleScriptVisitor = new GradleScriptVisitor();

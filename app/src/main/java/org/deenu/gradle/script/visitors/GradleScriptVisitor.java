@@ -23,14 +23,6 @@ import org.codehaus.groovy.ast.expr.MapExpression;
 
 public class GradleScriptVisitor extends CodeVisitorSupport {
 
-	
-
-	@Override
-	public void visitTupleExpression(TupleExpression arg0) {
-	//	System.out.println(arg0.getText());
-		super.visitTupleExpression(arg0);
-	}
-
 	private Stack<Boolean> blockStatementStack = new Stack<>();
 
 	private int pluginsLastLineNumber = -1;
@@ -101,6 +93,15 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
 	private String dependencyResolutionManagementRepositoriesConfigurationName;
 	private boolean inDependencyResolutionManagementRepositories = false;
 	private List<Repository> dependencyResolutionManagementRepositories = new ArrayList<>();
+	
+	private int dependencyresolutionmanagementrepositoriesflatDirLastLineNumber = -1;
+	private String dependencyresolutionmanagementrepositoriesflatDirConfigurationName;
+	private boolean inDependencyResolutionManagementRepositoriesFlatDir = false;
+	
+	private int dependencyresolutionmanagementrepositoriesflatDirdirsLastLineNumber = -1;
+	private String dependencyresolutionmanagementrepositoriesflatDirdirsConfigurationName;
+	private boolean inDependencyResolutionManagementRepositoriesFlatDirDirs = false;
+	private List<FlatDir> dependencyresolutionmanagementrepositoriesflatDirDirs = new ArrayList<>();
 
 	public int getPluginsLastLineNumber() {
 		return pluginsLastLineNumber;
@@ -184,6 +185,18 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
 
 	public List<Repository> getDependencyResolutionManagementRepositories() {
 		return dependencyResolutionManagementRepositories;
+	}
+	
+	public int getDependencyResolutionManagementRepositoriesFlatDirLastLineNumber() {
+		return dependencyresolutionmanagementrepositoriesflatDirLastLineNumber;
+	}
+
+	public int getDependencyResolutionManagementRepositoriesFlatDirDirsLastLineNumber() {
+		return dependencyresolutionmanagementrepositoriesflatDirdirsLastLineNumber;
+	}
+
+	public List<FlatDir> getDependencyResolutionManagementRepositoriesFlatDirDirs() {
+		return dependencyresolutionmanagementrepositoriesflatDirDirs;
 	}
 
 	public String getRootProjectName() {
@@ -357,6 +370,17 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
 			blockStatementStack.push(true);
 			super.visitBlockStatement(blockStatement);
 			blockStatementStack.pop();
+        
+		} else if (inDependencyResolutionManagementRepositories && inDependencyResolutionManagementRepositoriesFlatDirDirs
+		/*    && !inBuildScriptRepositories
+			&& !inPluginManagementRepositories
+			&& !inDependencyResolutionManagementRepositories
+		&& !inPlugins
+			*/
+		) {
+			blockStatementStack.push(true);
+			super.visitBlockStatement(blockStatement);
+			blockStatementStack.pop();
 
 		} else {
 			super.visitBlockStatement(blockStatement);
@@ -427,6 +451,15 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
 		if (lineNumber > dependencyResolutionManagementRepositoriesLastLineNumber) {
 			inDependencyResolutionManagementRepositories = false;
 		}
+		
+		if (lineNumber > dependencyresolutionmanagementrepositoriesflatDirLastLineNumber) {
+			inDependencyResolutionManagementRepositoriesFlatDir = false;
+		}		
+
+		if (lineNumber > dependencyresolutionmanagementrepositoriesflatDirdirsLastLineNumber) {
+			inDependencyResolutionManagementRepositoriesFlatDirDirs = false;
+		}
+
 
 		if (methodName.equals("plugins")) {
 			pluginsLastLineNumber = methodCallExpression.getLastLineNumber();
@@ -507,6 +540,16 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
 			inDependencyResolutionManagementRepositories = true;
 			//System.out.println(lineNumber +  " " + methodName + " " + inDependencyResolutionManagement);	  
 		}
+		
+		if (inDependencyResolutionManagement && inRepositories && inFlatDir) {
+			dependencyresolutionmanagementrepositoriesflatDirLastLineNumber = methodCallExpression.getLastLineNumber();
+			inDependencyResolutionManagementRepositoriesFlatDir = true;
+		}
+
+		if (inDependencyResolutionManagement && inRepositories && inFlatDir && inFlatDirDirs) {
+			dependencyresolutionmanagementrepositoriesflatDirdirsLastLineNumber = methodCallExpression.getLastLineNumber();
+			inDependencyResolutionManagementRepositoriesFlatDirDirs = true;
+		}
 
 		if (inRepositories
 				//   && !inPlugins
@@ -576,7 +619,7 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
 		//      && !inPlugins
 
 				&& (blockStatementStack.isEmpty() ? false : blockStatementStack.peek())) {
-			allprojectsrepositoriesflatDirdirsConfigurationName = methodName;
+		//	allprojectsrepositoriesflatDirdirsConfigurationName = methodName;
 
 			Expression expression = methodCallExpression.getArguments();
 
@@ -639,6 +682,34 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
 			}
 			if (methodName.equals("gradlePluginPortal")) {
 				dependencyResolutionManagementRepositories.add(new Repository(methodName, "https://plugins.gradle.org/m2/"));
+			}
+		}
+		
+		if (inDependencyResolutionManagementRepositories && inDependencyResolutionManagementRepositoriesFlatDirDirs
+		//     && !inBuildScriptRepositories
+		//      && !inPluginManagementRepositories
+		//      && !inPlugins
+
+				&& (blockStatementStack.isEmpty() ? false : blockStatementStack.peek())) {
+		//	allprojectsrepositoriesflatDirdirsConfigurationName = methodName;
+
+			Expression expression = methodCallExpression.getArguments();
+
+			if (expression != null && expression instanceof TupleExpression) {
+				TupleExpression tupleExpression = (TupleExpression) expression;
+				if (tupleExpression != null) {
+					for (Expression expr : tupleExpression.getExpressions()) {
+						if (expr != null && expr instanceof ConstantExpression) {
+							ConstantExpression constantExpression = (ConstantExpression) expr;
+							if (constantExpression != null) {
+								String constantExpressionText = constantExpression.getText();
+								if (constantExpressionText != null) {
+									dependencyresolutionmanagementrepositoriesflatDirDirs.add(new FlatDir(constantExpressionText));
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 		
