@@ -251,15 +251,15 @@ private int dependencyResolutionManagementLastLineNumber = -1;
           }
 
           if (expressionText != null
-              && pluginManagementRepositoriesConfigurationName != null
+              && repositoriesConfigurationName != null
               && inPluginManagementRepositories
               && !inBuildScriptRepositories
               && !inAllProjectsRepositories			
 			  && !inDependencyResolutionManagementRepositories
-              && !inPlugins
+            //  && !inPlugins
               && !inFlatDir) {
             pluginManagementRepositories.add(
-                new Repository(pluginManagementRepositoriesConfigurationName, expressionText));
+                new Repository(repositoriesConfigurationName, expressionText));
           }
 		  
 		  if (expressionText != null
@@ -338,20 +338,23 @@ private int dependencyResolutionManagementLastLineNumber = -1;
 
     } else if (inAllProjectsRepositories
         && inAllProjectsRepositoriesFlatDirDirs
-        && !inBuildScriptRepositories
+    /*    && !inBuildScriptRepositories
 		&& !inPluginManagementRepositories
 		&& !inDependencyResolutionManagementRepositories
-        && !inPlugins) {
+        && !inPlugins
+		*/
+		) {
       blockStatementStack.push(true);
       super.visitBlockStatement(blockStatement);
       blockStatementStack.pop();
 
     } else if (inPluginManagementRepositories
-        && !inBuildScriptRepositories
-        && !inAllProjectsRepositories	
-		&& !inDependencyResolutionManagementRepositories
-        && !inPlugins
-        && !inFlatDir) {
+     //   && !inBuildScriptRepositories
+     //   && !inAllProjectsRepositories	
+	//	&& !inDependencyResolutionManagementRepositories
+     //   && !inPlugins
+    //    && !inFlatDir
+		) {
       blockStatementStack.push(true);
       super.visitBlockStatement(blockStatement);
       blockStatementStack.pop();
@@ -572,13 +575,48 @@ private int dependencyResolutionManagementLastLineNumber = -1;
         allprojectsRepositories.add(new Repository(methodName, "https://plugins.gradle.org/m2/"));
       }
     }
+	
+	if (inAllProjectsRepositories
+            && inAllProjectsRepositoriesFlatDirDirs
+       //     && !inBuildScriptRepositories
+      //      && !inPluginManagementRepositories
+      //      && !inPlugins
+	  
+        && (blockStatementStack.isEmpty() ? false : blockStatementStack.peek())) {
+      allprojectsrepositoriesflatDirdirsConfigurationName = methodName;
+
+      Expression expression = methodCallExpression.getArguments();
+
+      if (expression != null && expression instanceof TupleExpression) {
+        TupleExpression tupleExpression = (TupleExpression) expression;
+        if (tupleExpression != null) {
+          for (Expression expr : tupleExpression.getExpressions()) {
+            if (expr != null && expr instanceof ConstantExpression) {
+              ConstantExpression constantExpression = (ConstantExpression) expr;
+              if (constantExpression != null) {
+                String constantExpressionText = constantExpression.getText();
+                if (constantExpressionText != null) {
+                  allprojectsrepositoriesflatDirDirs.add(new FlatDir(constantExpressionText));
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
 
     if (inPluginManagementRepositories
-        && !inBuildScriptRepositories
-        && !inAllProjectsRepositories
+     //   && !inBuildScriptRepositories
+      //  && !inAllProjectsRepositories
 		&& !inDependencyResolutionManagementRepositories
-        && !inPlugins
-        && !inFlatDir) {
+       && !inPlugins
+        && !inFlatDir
+		) {
+		
+		//	System.out.println(lineNumber +  " " + methodName + " in PMR " + inPluginManagement + " " + inDependencyResolutionManagement);	  
+			
+
       if (methodName.equals("google")) {
         pluginManagementRepositories.add(new Repository(methodName, "https://maven.google.com/"));
       }
@@ -617,35 +655,7 @@ private int dependencyResolutionManagementLastLineNumber = -1;
             new Repository(methodName, "https://plugins.gradle.org/m2/"));
       }
     }
-
-    if ((inAllProjectsRepositories
-            && inAllProjectsRepositoriesFlatDirDirs
-            && !inBuildScriptRepositories
-            && !inPluginManagementRepositories
-            && !inPlugins)
-        && (blockStatementStack.isEmpty() ? false : blockStatementStack.peek())) {
-      allprojectsrepositoriesflatDirdirsConfigurationName = methodName;
-
-      Expression expression = methodCallExpression.getArguments();
-
-      if (expression != null && expression instanceof TupleExpression) {
-        TupleExpression tupleExpression = (TupleExpression) expression;
-        if (tupleExpression != null) {
-          for (Expression expr : tupleExpression.getExpressions()) {
-            if (expr != null && expr instanceof ConstantExpression) {
-              ConstantExpression constantExpression = (ConstantExpression) expr;
-              if (constantExpression != null) {
-                String constantExpressionText = constantExpression.getText();
-                if (constantExpressionText != null) {
-                  allprojectsrepositoriesflatDirDirs.add(new FlatDir(constantExpressionText));
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
+    
     if (inPlugins
        //     && !inBuildScript
        //     && !inAllProjects
@@ -700,13 +710,16 @@ private int dependencyResolutionManagementLastLineNumber = -1;
       super.visitMethodCallExpression(methodCallExpression);
       allprojectsRepositoriesConfigurationName = null;
 
-    } else if ((inPluginManagementRepositories
-            && !inBuildScriptRepositories
+    } else if (inPluginManagementRepositories
+        /*    && !inBuildScriptRepositories
             && !inAllProjectsRepositories
 			&& !inDependencyResolutionManagementRepositories
             && !inPlugins
-            && !inFlatDir)
+            && !inFlatDir
+			*/
         && (blockStatementStack.isEmpty() ? false : blockStatementStack.peek())) {
+  //   System.out.println(lineNumber +  " " + methodName + " " + inPluginManagement + " " + inPluginManagementRepositories  + " " + repositoriesConfigurationName + " inPMRS " + inDependencyResolutionManagementRepositories);
+
       pluginManagementRepositoriesConfigurationName = methodName;
       	  	  super.visitMethodCallExpression(methodCallExpression);
       pluginManagementRepositoriesConfigurationName = null;
