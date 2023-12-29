@@ -9,13 +9,13 @@ repositories {
 	 mavenCentral() 
      gradlePluginPortal()  
    
-     flatDir {
+     /*flatDir {
            dirs 'lib'           
      } 
         
      flatDir {
            dirs 'lib2','lib3'          
-     }       
+     }*/      
 }
 
 buildscript {
@@ -24,13 +24,13 @@ buildscript {
         google()
         mavenLocal()  
         
-        flatDir {
+        /*flatDir {
            dirs 'lib4'           
         } 
           
         flatDir {
            dirs 'lib5','lib6'          
-        }              
+        }*/             
     }   
 }
 
@@ -57,13 +57,13 @@ pluginManagement {
         mavenCentral()
         maven { url "https://jitpack.io" }  
         	    
-        flatDir {
+        /*flatDir {
             dirs 'lib10'           
         } 
         
         flatDir {
             dirs 'lib11','lib12'          
-        }    
+        }*/ 
     }
 }
 
