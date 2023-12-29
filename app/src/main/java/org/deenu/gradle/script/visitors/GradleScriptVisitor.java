@@ -239,15 +239,15 @@ private int dependencyResolutionManagementLastLineNumber = -1;
           }
 
           if (expressionText != null
-              && allprojectsRepositoriesConfigurationName != null
+              && repositoriesConfigurationName != null
               && inAllProjectsRepositories
               && !inBuildScriptRepositories
 			  && !inPluginManagementRepositories
 			  && !inDependencyResolutionManagementRepositories
-              && !inPlugins
+          //    && !inPlugins
               && !inFlatDir) {
             allprojectsRepositories.add(
-                new Repository(allprojectsRepositoriesConfigurationName, expressionText));
+                new Repository(repositoriesConfigurationName, expressionText));
           }
 
           if (expressionText != null
@@ -326,11 +326,12 @@ private int dependencyResolutionManagementLastLineNumber = -1;
       blockStatementStack.pop();
 
     } else if (inAllProjectsRepositories
-        && !inBuildScriptRepositories
+     /*   && !inBuildScriptRepositories
 		&& !inPluginManagementRepositories
 		&& !inDependencyResolutionManagementRepositories
         && !inPlugins
-        && !inFlatDir) {
+        && !inFlatDir*/
+		) {
       blockStatementStack.push(true);
       super.visitBlockStatement(blockStatement);
       blockStatementStack.pop();
@@ -550,11 +551,13 @@ private int dependencyResolutionManagementLastLineNumber = -1;
     }
 
     if (inAllProjectsRepositories
-        && !inBuildScriptRepositories
-        && !inPluginManagementRepositories
-		&& !inDependencyResolutionManagementRepositories
-        && !inPlugins
+     //   && !inBuildScriptRepositories
+     //   && !inPluginManagementRepositories
+	//	&& !inDependencyResolutionManagementRepositories
+     //   && !inPlugins
         && !inFlatDir) {
+	//		System.out.println(lineNumber +  " " + methodName + " " + inAllProjects + " " + inAllProjectsRepositories);	  
+
       if (methodName.equals("google")) {
         allprojectsRepositories.add(new Repository(methodName, "https://maven.google.com/"));
       }
@@ -683,14 +686,17 @@ private int dependencyResolutionManagementLastLineNumber = -1;
       super.visitMethodCallExpression(methodCallExpression);
       buildscriptRepositoriesConfigurationName = null;
 
-    } else if ((inAllProjectsRepositories
-            && !inBuildScriptRepositories
+    } else if (inAllProjectsRepositories
+         /*   && !inBuildScriptRepositories
             && !inPluginManagementRepositories
 			&& !inDependencyResolutionManagementRepositories
             && !inPlugins
-            && !inFlatDir)
-        && (blockStatementStack.isEmpty() ? false : blockStatementStack.peek())) {
+            && !inFlatDir
+			*/
+			
+        && !(blockStatementStack.isEmpty() ? false : blockStatementStack.peek())) {
       allprojectsRepositoriesConfigurationName = methodName;
+     // System.out.println(lineNumber +  " " + methodName + " " + inAllProjects + " " + inAllProjectsRepositories  + " " + repositoriesConfigurationName);
       super.visitMethodCallExpression(methodCallExpression);
       allprojectsRepositoriesConfigurationName = null;
 
@@ -702,7 +708,7 @@ private int dependencyResolutionManagementLastLineNumber = -1;
             && !inFlatDir)
         && (blockStatementStack.isEmpty() ? false : blockStatementStack.peek())) {
       pluginManagementRepositoriesConfigurationName = methodName;
-      super.visitMethodCallExpression(methodCallExpression);
+      	  	  super.visitMethodCallExpression(methodCallExpression);
       pluginManagementRepositoriesConfigurationName = null;
 	  
 	} else if ((inDependencyResolutionManagementRepositories
