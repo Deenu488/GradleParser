@@ -11,8 +11,8 @@ public class Main {
 
       File buildGradle = new File("/storage/emulated/0/test/build.gradle");
       GradleScript gradleScript = new GradleScript(buildGradle);
-
-      System.out.println("GradleFile: " + gradleScript.getGradleFile());
+      
+	  System.out.println("GradleFile: " + gradleScript.getGradleFile());
       System.out.println("GradleFileName: " + gradleScript.getGradleFileName());
       System.out.println("IsGradleBuildFile: " + gradleScript.isGradleBuildFile());
       System.out.println("IsGradleSettingsFile: " + gradleScript.isGradleSettingsFile());

@@ -134,4 +134,8 @@ public class GradleScript {
       astNode.visit(visitor);
     }
   }
+  
+  public GradleScriptVisitor getGradleScriptVisitor() {
+	  return this.gradleScriptVisitor;
+  }
 }
