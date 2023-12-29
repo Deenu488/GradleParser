@@ -70,6 +70,7 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
+        maven { url "https://jitpack.io" }  
         google()
         mavenCentral()
         mavenLocal()
@@ -80,10 +81,11 @@ dependencyResolutionManagement {
         
         flatDir {
             dirs 'lib14','lib15'          
-        }    
+        }   
     }
 }
 
 rootProject.name = "GradleParser"
 include ':app'
 include ':app2'
+include ':app3',':app4'
