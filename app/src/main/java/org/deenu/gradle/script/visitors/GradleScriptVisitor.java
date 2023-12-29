@@ -80,7 +80,7 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
   private boolean inPluginManagementRepositories = false;
   private List<Repository> pluginManagementRepositories = new ArrayList<>();
 
-private int dependencyResolutionManagementLastLineNumber = -1;
+  private int dependencyResolutionManagementLastLineNumber = -1;
   private String dependencyResolutionManagementConfigurationName;
   private boolean inDependencyResolutionManagement = false;
 
@@ -260,20 +260,8 @@ private int dependencyResolutionManagementLastLineNumber = -1;
               && !inFlatDir) {
             pluginManagementRepositories.add(
                 new Repository(repositoriesConfigurationName, expressionText));
-          }
+          }		  
 		  
-		  if (expressionText != null
-              && dependencyResolutionManagementRepositoriesConfigurationName != null
-              && inDependencyResolutionManagementRepositories
-              && !inBuildScriptRepositories
-              && !inAllProjectsRepositories			
-			  && !inPluginManagementRepositories
-              && !inPlugins
-              && !inFlatDir) {
-            dependencyResolutionManagementRepositories.add(
-                new Repository(dependencyResolutionManagementRepositoriesConfigurationName, expressionText));
-          }
-
           if (expressionText != null && inInclude) {
             includes.add(new Include(expressionText));
           }
@@ -357,17 +345,7 @@ private int dependencyResolutionManagementLastLineNumber = -1;
 		) {
       blockStatementStack.push(true);
       super.visitBlockStatement(blockStatement);
-      blockStatementStack.pop();
-    
-	 } else if (inDependencyResolutionManagementRepositories
-        && !inBuildScriptRepositories
-        && !inAllProjectsRepositories	
-		&& !inPluginManagementRepositories
-        && !inPlugins
-        && !inFlatDir) {
-      blockStatementStack.push(true);
-      super.visitBlockStatement(blockStatement);
-      blockStatementStack.pop();
+      blockStatementStack.pop();    	 
 	  
     } else {
       super.visitBlockStatement(blockStatement);
@@ -429,6 +407,10 @@ private int dependencyResolutionManagementLastLineNumber = -1;
 	
 	 if (lineNumber > dependencyResolutionManagementLastLineNumber) {
       inDependencyResolutionManagement = false;
+    }
+	
+	if (lineNumber > dependencyResolutionManagementRepositoriesLastLineNumber) {
+      inDependencyResolutionManagementRepositories = false;
     }
 
     if (methodName.equals("plugins")) {
@@ -506,7 +488,7 @@ private int dependencyResolutionManagementLastLineNumber = -1;
       dependencyResolutionManagementRepositoriesLastLineNumber = methodCallExpression.getLastLineNumber();
       inDependencyResolutionManagementRepositories = true;	  
     }
-
+		
     if (inRepositories
      //   && !inPlugins
         && !inBuildScript
@@ -609,8 +591,8 @@ private int dependencyResolutionManagementLastLineNumber = -1;
     if (inPluginManagementRepositories
      //   && !inBuildScriptRepositories
       //  && !inAllProjectsRepositories
-		&& !inDependencyResolutionManagementRepositories
-       && !inPlugins
+//		&& !inDependencyResolutionManagementRepositories
+  //     && !inPlugins
         && !inFlatDir
 		) {
 		
@@ -632,29 +614,7 @@ private int dependencyResolutionManagementLastLineNumber = -1;
             new Repository(methodName, "https://plugins.gradle.org/m2/"));
       }
     }
-	
-	if (inDependencyResolutionManagementRepositories
-       // && !inBuildScriptRepositories
-   //     && !inAllProjectsRepositories
-	//	&& !inPluginManagementRepositories
-	&& !inInclude
-        && !inPlugins
-        && !inFlatDir) {			
-      if (methodName.equals("google")) {
-        dependencyResolutionManagementRepositories.add(new Repository(methodName, "https://maven.google.com/"));
-      }
-      if (methodName.equals("mavenLocal")) {
-        dependencyResolutionManagementRepositories.add(new Repository(methodName, ".m2/repository"));
-      }
-      if (methodName.equals("mavenCentral")) {
-        dependencyResolutionManagementRepositories.add(
-            new Repository(methodName, "https://repo.maven.apache.org/maven2/"));
-      }
-      if (methodName.equals("gradlePluginPortal")) {
-        dependencyResolutionManagementRepositories.add(
-            new Repository(methodName, "https://plugins.gradle.org/m2/"));
-      }
-    }
+		
     
     if (inPlugins
        //     && !inBuildScript
@@ -724,18 +684,8 @@ private int dependencyResolutionManagementLastLineNumber = -1;
       	  	  super.visitMethodCallExpression(methodCallExpression);
       pluginManagementRepositoriesConfigurationName = null;
 	  
-	} else if ((inDependencyResolutionManagementRepositories
-            && !inBuildScriptRepositories
-            && !inAllProjectsRepositories
-			&& !inPluginManagementRepositories
-            && !inPlugins
-            && !inFlatDir)
-        && (blockStatementStack.isEmpty() ? false : blockStatementStack.peek())) {
-      dependencyResolutionManagementRepositoriesConfigurationName = methodName;
-      super.visitMethodCallExpression(methodCallExpression);
-      dependencyResolutionManagementRepositoriesConfigurationName = null;
 
-    } else if (inInclude) {
+   } else if (inInclude) {
       includeConfigurationName = methodName;
       super.visitMethodCallExpression(methodCallExpression);
       includeConfigurationName = null;
