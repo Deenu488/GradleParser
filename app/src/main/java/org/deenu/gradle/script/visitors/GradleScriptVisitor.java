@@ -221,17 +221,21 @@ private int dependencyResolutionManagementLastLineNumber = -1;
 			  ) {
             repositories.add(new Repository(repositoriesConfigurationName, expressionText));
           }
+		  
+		//  System.out.println(expressionText + " " + repositoriesConfigurationName + " " + inBuildScriptRepositories);
 		  		  
           if (expressionText != null
-              && buildscriptRepositoriesConfigurationName != null
+              && repositoriesConfigurationName != null
               && inBuildScriptRepositories
               && !inAllProjectsRepositories
 			  && !inPluginManagementRepositories
 			  && !inDependencyResolutionManagementRepositories
-              && !inPlugins
-              && !inFlatDir) {				  
+        //      && !inPlugins
+             && !inFlatDir
+		 ) {		
+			// System.out.println(expressionText);		  
             buildscriptRepositories.add(
-                new Repository(buildscriptRepositoriesConfigurationName, expressionText));
+                new Repository(repositoriesConfigurationName, expressionText));
           }
 
           if (expressionText != null
@@ -309,13 +313,14 @@ private int dependencyResolutionManagementLastLineNumber = -1;
       blockStatementStack.push(true);
       super.visitBlockStatement(blockStatement);
       blockStatementStack.pop();
-
-    } else if (inBuildScriptRepositories
-        && !inAllProjectsRepositories
+	  
+} else if (inBuildScriptRepositories
+       /* && !inAllProjectsRepositories
 		&& !inPluginManagementRepositories
 		&& !inDependencyResolutionManagementRepositories
         && !inPlugins
-        && !inFlatDir) {
+        && !inFlatDir*/
+		) {
       blockStatementStack.push(true);
       super.visitBlockStatement(blockStatement);
       blockStatementStack.pop();
@@ -435,6 +440,7 @@ private int dependencyResolutionManagementLastLineNumber = -1;
     if (methodName.equals("buildscript")) {
       buildscriptLastLineNumber = methodCallExpression.getLastLineNumber();
       inBuildScript = true;
+//	  System.out.println(lineNumber +  " " + methodName + " " + inBuildScript);	  
     }
 
     if (methodName.equals("allprojects")) {
@@ -469,7 +475,7 @@ private int dependencyResolutionManagementLastLineNumber = -1;
 
     if (inBuildScript && inRepositories) {
       buildscriptRepositoriesLastLineNumber = methodCallExpression.getLastLineNumber();
-      inBuildScriptRepositories = true;	  
+      inBuildScriptRepositories = true;	  	  
     }
 
     if (inAllProjects && inRepositories) {
@@ -520,11 +526,14 @@ private int dependencyResolutionManagementLastLineNumber = -1;
     }
 
     if (inBuildScriptRepositories
-        && !inAllProjectsRepositories
-        && !inPluginManagementRepositories
-		&& !inDependencyResolutionManagementRepositories
-        && !inPlugins
-        && !inFlatDir) {			
+      //  && !inAllProjectsRepositories
+    //    && !inPluginManagementRepositories
+	//	&& !inDependencyResolutionManagementRepositories
+   //     && !inPlugins
+        && !inFlatDir
+		) {
+		//	System.out.println(lineNumber +  " " + methodName + " " + inBuildScript + " " + inBuildScriptRepositories);	  
+			
       if (methodName.equals("google")) {
         buildscriptRepositories.add(new Repository(methodName, "https://maven.google.com/"));
       }
@@ -645,27 +654,32 @@ private int dependencyResolutionManagementLastLineNumber = -1;
       super.visitMethodCallExpression(methodCallExpression);
       pluginsConfigurationName = null;
 
-    } else if ((inRepositories
+    } else if (inRepositories
          //   && !inPlugins
        //     && !inBuildScript
       //      && !inAllProjects			
        //      && !inPluginManagement
 	//		&& !inDependencyResolutionManagement
       //      && !inFlatDir
-			)
+			
         && (blockStatementStack.isEmpty() ? false : blockStatementStack.peek())) {
       repositoriesConfigurationName = methodName;
       super.visitMethodCallExpression(methodCallExpression);
       repositoriesConfigurationName = null;
 
-    } else if ((inBuildScriptRepositories
-            && !inAllProjectsRepositories
+    } else if (inBuildScriptRepositories
+          /*  && !inAllProjectsRepositories
             && !inPluginManagementRepositories
 			&& !inDependencyResolutionManagementRepositories
             && !inPlugins
-            && inFlatDir)
-        && (blockStatementStack.isEmpty() ? false : blockStatementStack.peek())) {
+            && inFlatDir
+		*/	
+        && !(blockStatementStack.isEmpty() ? false : blockStatementStack.peek())
+					
+					) {
+						
       buildscriptRepositoriesConfigurationName = methodName;
+	 // System.out.println(lineNumber +  " " + methodName + " " + inBuildScript + " " + inBuildScriptRepositories  + " " + repositoriesConfigurationName);
       super.visitMethodCallExpression(methodCallExpression);
       buildscriptRepositoriesConfigurationName = null;
 

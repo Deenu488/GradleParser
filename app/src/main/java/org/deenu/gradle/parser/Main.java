@@ -17,9 +17,9 @@ public class Main {
    //   System.out.println("IsGradleBuildFile: " + gradleScript.isGradleBuildFile());
   //    System.out.println("IsGradleSettingsFile: " + gradleScript.isGradleSettingsFile());
    //   System.out.println("Plugins: " + gradleScript.getPlugins());
-    System.out.println("Repositories: " + gradleScript.getRepositories());
-    //    System.out.println("BuildScriptRepositories: " + gradleScript.getBuildScriptRepositories());
- //     System.out.println("AllProjectsRepositories: " + gradleScript.getAllProjectsRepositories());
+  //  System.out.println("Repositories: " + gradleScript.getRepositories());
+    //   System.out.println("BuildScriptRepositories: " + gradleScript.getBuildScriptRepositories());
+      System.out.println("AllProjectsRepositories: " + gradleScript.getAllProjectsRepositories());
   //    System.out.println(
    //       "AllProjectsRepositoriesFlatDirDirs: "
    //           + gradleScript.getAllProjectsRepositoriesFlatDirDirs());
