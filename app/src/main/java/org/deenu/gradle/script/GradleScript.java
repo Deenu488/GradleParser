@@ -99,6 +99,18 @@ public class GradleScript {
     return this.gradleScriptVisitor.getAllProjectsRepositoriesFlatDirDirs();
   }
 
+  public List<Repository> getPluginManagementRepositories() {
+    this.gradleScriptVisitor = new GradleScriptVisitor();
+    walkScript(gradleScriptVisitor);
+    return this.gradleScriptVisitor.getPluginManagementRepositories();
+  }
+  
+  public List<Repository> getDependencyResolutionManagementRepositories() {
+    this.gradleScriptVisitor = new GradleScriptVisitor();
+    walkScript(gradleScriptVisitor);
+    return this.gradleScriptVisitor.getDependencyResolutionManagementRepositories();
+  }
+
   public String getRootProjectName() {
     this.gradleScriptVisitor = new GradleScriptVisitor();
     walkScript(gradleScriptVisitor);

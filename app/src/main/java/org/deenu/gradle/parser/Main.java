@@ -12,19 +12,23 @@ public class Main {
       File buildGradle = new File("/storage/emulated/0/test/build.gradle");
       GradleScript gradleScript = new GradleScript(buildGradle);
 
-      System.out.println("GradleFile: " + gradleScript.getGradleFile());
-      System.out.println("GradleFileName: " + gradleScript.getGradleFileName());
-      System.out.println("IsGradleBuildFile: " + gradleScript.isGradleBuildFile());
-      System.out.println("IsGradleSettingsFile: " + gradleScript.isGradleSettingsFile());
-      System.out.println("Plugins: " + gradleScript.getPlugins());
-      System.out.println("Repositories: " + gradleScript.getRepositories());
-      System.out.println("BuildScriptRepositories: " + gradleScript.getBuildScriptRepositories());
-      System.out.println("AllProjectsRepositories: " + gradleScript.getAllProjectsRepositories());
-      System.out.println(
-          "AllProjectsRepositoriesFlatDirDirs: "
-              + gradleScript.getAllProjectsRepositoriesFlatDirDirs());
-      System.out.println("rootProjectName: " + gradleScript.getRootProjectName());
-      System.out.println("Include: " + gradleScript.getIncludes());
+    //  System.out.println("GradleFile: " + gradleScript.getGradleFile());
+   //   System.out.println("GradleFileName: " + gradleScript.getGradleFileName());
+   //   System.out.println("IsGradleBuildFile: " + gradleScript.isGradleBuildFile());
+  //    System.out.println("IsGradleSettingsFile: " + gradleScript.isGradleSettingsFile());
+   //   System.out.println("Plugins: " + gradleScript.getPlugins());
+    System.out.println("Repositories: " + gradleScript.getRepositories());
+    //    System.out.println("BuildScriptRepositories: " + gradleScript.getBuildScriptRepositories());
+ //     System.out.println("AllProjectsRepositories: " + gradleScript.getAllProjectsRepositories());
+  //    System.out.println(
+   //       "AllProjectsRepositoriesFlatDirDirs: "
+   //           + gradleScript.getAllProjectsRepositoriesFlatDirDirs());
+//	  System.out.println(
+ //       "PluginManagementRepositories: " + gradleScript.getPluginManagementRepositories());
+ //    System.out.println(
+  //        "DependencyResolutionManagementRepositories: " + gradleScript.getDependencyResolutionManagementRepositories());	 
+//	        System.out.println("rootProjectName: " + gradleScript.getRootProjectName());
+ //     System.out.println("Include: " + gradleScript.getIncludes());
 
     } catch (Exception e) {
       System.out.println(new ParserFailedException(e.getMessage()));

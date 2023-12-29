@@ -33,5 +33,29 @@ allprojects {
     }   
 }
 
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        mavenLocal()
+		
+		  flatDir {
+            dirs 'lib4'           
+        } 
+        
+        flatDir {
+            dirs 'lib5','lib6'          
+        }    
+    }
+}
+
 rootProject.name = "GradleParser"
 include ':app'
