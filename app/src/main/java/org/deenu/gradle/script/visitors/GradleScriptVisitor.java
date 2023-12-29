@@ -15,6 +15,9 @@ import org.deenu.gradle.models.FlatDir;
 import org.deenu.gradle.models.Include;
 import org.deenu.gradle.models.Plugin;
 import org.deenu.gradle.models.Repository;
+import org.codehaus.groovy.ast.expr.Expression;
+import org.codehaus.groovy.ast.expr.MapEntryExpression;
+import org.codehaus.groovy.ast.expr.MapExpression;
 
 public class GradleScriptVisitor extends CodeVisitorSupport {
 
@@ -281,7 +284,8 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
     if (leftExpression != null && rightExpression != null) {
       String leftExpressionText = leftExpression.getText();
       String rightExpressionText = rightExpression.getText();
-      if (leftExpressionText != null && rightExpressionText != null) {
+ 
+ 	  if (leftExpressionText != null && rightExpressionText != null) {
         if (leftExpressionText.equals("rootProject.name")) {
           rootProjectName = rightExpressionText;
         }

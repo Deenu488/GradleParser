@@ -5,15 +5,32 @@ plugins {
 }
 
 repositories {
+     maven { url "https://jitpack.io" }  	
 	 mavenCentral() 
-     gradlePluginPortal()       
+     gradlePluginPortal()  
+   
+     flatDir {
+           dirs 'lib'           
+     } 
+        
+     flatDir {
+           dirs 'lib2','lib3'          
+     }       
 }
 
 buildscript {
     repositories {
         maven { url "https://jitpack.io" }  	            
         google()
-        mavenLocal()           
+        mavenLocal()  
+        
+        flatDir {
+           dirs 'lib4'           
+        } 
+          
+        flatDir {
+           dirs 'lib5','lib6'          
+        }              
     }   
 }
 
@@ -24,11 +41,11 @@ allprojects {
         mavenLocal()
         
         flatDir {
-            dirs 'lib'           
+            dirs 'lib7'           
         } 
         
         flatDir {
-            dirs 'lib2','lib3'          
+            dirs 'lib8','lib9'          
         }    
     }   
 }
@@ -38,8 +55,18 @@ pluginManagement {
         gradlePluginPortal()
         google()
         mavenCentral()
+        maven { url "https://jitpack.io" }  
+        	    
+        flatDir {
+            dirs 'lib10'           
+        } 
+        
+        flatDir {
+            dirs 'lib11','lib12'          
+        }    
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -47,15 +74,16 @@ dependencyResolutionManagement {
         mavenCentral()
         mavenLocal()
 		
-		  flatDir {
-            dirs 'lib4'           
+	    flatDir {
+            dirs 'lib13'           
         } 
         
         flatDir {
-            dirs 'lib5','lib6'          
+            dirs 'lib14','lib15'          
         }    
     }
 }
 
 rootProject.name = "GradleParser"
 include ':app'
+include ':app2'

@@ -23,12 +23,12 @@ public class Main {
   //    System.out.println(
    //       "AllProjectsRepositoriesFlatDirDirs: "
    //           + gradleScript.getAllProjectsRepositoriesFlatDirDirs());
-	  System.out.println(
-       "PluginManagementRepositories: " + gradleScript.getPluginManagementRepositories());
+	//  System.out.println(
+    //   "PluginManagementRepositories: " + gradleScript.getPluginManagementRepositories());
   //   System.out.println(
    //       "DependencyResolutionManagementRepositories: " + gradleScript.getDependencyResolutionManagementRepositories());	 
-//	        System.out.println("rootProjectName: " + gradleScript.getRootProjectName());
- //     System.out.println("Include: " + gradleScript.getIncludes());
+	  //     System.out.println("rootProjectName: " + gradleScript.getRootProjectName());
+      System.out.println("Include: " + gradleScript.getIncludes());
 
     } catch (Exception e) {
       System.out.println(new ParserFailedException(e.getMessage()));
