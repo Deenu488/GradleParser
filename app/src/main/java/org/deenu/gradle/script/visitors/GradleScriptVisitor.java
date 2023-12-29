@@ -249,6 +249,20 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
             allprojectsRepositories.add(
                 new Repository(repositoriesConfigurationName, expressionText));
           }
+		  
+		  if (expressionText != null
+              && repositoriesConfigurationName != null
+              && inPluginManagementRepositories
+              && !inAllProjectsRepositories
+			  && !inBuildScriptRepositories
+			  && !inDependencyResolutionManagementRepositories
+        //      && !inPlugins
+             && !inFlatDir
+		 ) {		
+			// System.out.println(expressionText);		  
+            pluginManagementRepositories.add(
+                new Repository(repositoriesConfigurationName, expressionText));
+          }
           		  
           if (expressionText != null && inInclude) {
             includes.add(new Include(expressionText));
@@ -324,6 +338,17 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
       super.visitBlockStatement(blockStatement);
       blockStatementStack.pop();
     
+    } else if (inPluginManagementRepositories
+       /* && !inAllProjectsRepositories
+		&& !inPluginManagementRepositories
+		&& !inDependencyResolutionManagementRepositories
+        && !inPlugins
+        && !inFlatDir*/
+		) {
+      blockStatementStack.push(true);
+      super.visitBlockStatement(blockStatement);
+      blockStatementStack.pop();
+
     } else {
       super.visitBlockStatement(blockStatement);
     }
@@ -382,6 +407,10 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
       inPluginManagement = false;
     }
 	
+	if (lineNumber > pluginManagementRepositoriesLastLineNumber) {
+      inPluginManagementRepositories = false;
+    }
+	
 	 if (lineNumber > dependencyResolutionManagementLastLineNumber) {
       inDependencyResolutionManagement = false;
     }
@@ -424,16 +453,17 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
     if (methodName.equals("dirs")) {
       flatDirdirsLastLineNumber = methodCallExpression.getLastLineNumber();
       inFlatDirDirs = true;
-    }
-
-    if (methodName.equals("pluginManagement")) {
+    }    
+	
+	if (methodName.equals("pluginManagement")) {
       pluginManagementLastLineNumber = methodCallExpression.getLastLineNumber();
       inPluginManagement = true;
+//	  System.out.println(lineNumber +  " " + methodName + " " + inPluginManagement);	  
     }
 	
 	if (methodName.equals("dependencyResolutionManagement")) {
-      dependencyResolutionManagementLastLineNumber = methodCallExpression.getLastLineNumber();
-      inDependencyResolutionManagement = true;
+  //    dependencyResolutionManagementLastLineNumber = methodCallExpression.getLastLineNumber();
+  //    inDependencyResolutionManagement = true;
     }
 
     if (inBuildScript && inRepositories) {
@@ -459,6 +489,7 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
     if (inPluginManagement && inRepositories) {
       pluginManagementRepositoriesLastLineNumber = methodCallExpression.getLastLineNumber();
       inPluginManagementRepositories = true;
+//	  System.out.println(lineNumber +  " " + methodName + " " + inPluginManagement);	  
     }
 	
 	if (inDependencyResolutionManagement && inRepositories) {
@@ -563,6 +594,31 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
         }
       }
     }
+	
+	if (inPluginManagementRepositories
+      //  && !inAllProjectsRepositories
+    //    && !inPluginManagementRepositories
+	//	&& !inDependencyResolutionManagementRepositories
+   //     && !inPlugins
+        && !inFlatDir
+		) {
+		//	System.out.println(lineNumber +  " " + methodName + " " + inBuildScript + " " + inBuildScriptRepositories);	  
+			
+      if (methodName.equals("google")) {
+        pluginManagementRepositories.add(new Repository(methodName, "https://maven.google.com/"));
+      }
+      if (methodName.equals("mavenLocal")) {
+        pluginManagementRepositories.add(new Repository(methodName, ".m2/repository"));
+      }
+      if (methodName.equals("mavenCentral")) {
+        pluginManagementRepositories.add(
+            new Repository(methodName, "https://repo.maven.apache.org/maven2/"));
+      }
+      if (methodName.equals("gradlePluginPortal")) {
+        pluginManagementRepositories.add(new Repository(methodName, "https://plugins.gradle.org/m2/"));
+      }
+    }
+	
         
     if (inPlugins
        //     && !inBuildScript
@@ -618,7 +674,23 @@ public class GradleScriptVisitor extends CodeVisitorSupport {
       super.visitMethodCallExpression(methodCallExpression);
       allprojectsRepositoriesConfigurationName = null;
    
-   } else if (inInclude) {
+   } else if (inPluginManagementRepositories
+          /*  && !inAllProjectsRepositories
+            && !inPluginManagementRepositories
+			&& !inDependencyResolutionManagementRepositories
+            && !inPlugins
+            && inFlatDir
+		*/	
+        && !(blockStatementStack.isEmpty() ? false : blockStatementStack.peek())
+					
+					) {
+						
+      pluginManagementRepositoriesConfigurationName = methodName;
+	 // System.out.println(lineNumber +  " " + methodName + " " + inBuildScript + " " + inBuildScriptRepositories  + " " + repositoriesConfigurationName);
+      super.visitMethodCallExpression(methodCallExpression);
+      pluginManagementRepositoriesConfigurationName = null;
+
+    } else if (inInclude) {
       includeConfigurationName = methodName;
       super.visitMethodCallExpression(methodCallExpression);
       includeConfigurationName = null;
